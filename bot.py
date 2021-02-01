@@ -68,7 +68,7 @@ async def day_reset_notif():
     print(f"Got channel {message_channel}")
     print("it is now " + str(targetTime) +"\n it has been " + str(timeDiff//60) + " minutes since the bot started running")
     await message_channel.send("it's day reset!")
-    print("day notif done yey")
+    print("day notif done yey yey")
 
 @day_reset_notif.before_loop
 async def before():

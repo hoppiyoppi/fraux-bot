@@ -4,6 +4,7 @@ Fraux Bot for Discord
 This is a bot that is currently in development, developed solely by me (hoppiyoppi) as a curiosity.
 
 Current features:
+  - !helpme command to surmise the bot's functions
   - !welcome command to give a short welcome message
   - responds to people saying hello to them
   - says a message at day reset time for Granblue Fantasy 

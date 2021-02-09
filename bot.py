@@ -22,6 +22,8 @@ greetings = ["hi bot", "Hi bot", "hello fraux", "Hello Fraux", "hello Fraux", "H
 
 bot = commands.Bot(command_prefix='!')
 
+
+
 @bot.command()
 async def welcome(ctx):
 
@@ -29,19 +31,24 @@ async def welcome(ctx):
     await ctx.send(response)
 
 
+@bot.command()
+async def helpme(ctx):
+
+    response = "I am Fraux Bot! Here are my current commands:\n!welcome to send a welcome message\n!bless to send luck for your gacha rolls!\nMy repo is at https://github.com/hoppiyoppi/fraux-bot\nFor questions, contact @hoppiyoppi#1863"
+    await ctx.send(response)
+    
+@bot.command()
+async def bless(ctx):
+
+    response = "Good rolls coming your way!"
+    await ctx.send(response)
+    await ctx.send(file=discord.File('frauxPat.png'))
+
 @bot.event
 async def on_ready():
-    for guild in bot.guilds:
-        if guild.name == GUILD:
-            break
 
-    print(
-        f'{bot.user} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})\n'
-    )
-
-    members = '\n - '.join([member.name for member in guild.members])
-    print(f'Guild Members:\n - {members}')
+    #set status
+    await bot.change_presence(activity=discord.Game(name='!helpme for info'))
     
 @bot.event
 async def on_message(message):

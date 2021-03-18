@@ -62,7 +62,8 @@ async def on_message(message):
 
 @bot.event
 async def on_raw_message_delete(payload):
-    response = "Payload is: " + str(payload.cached_message)
+    response = "Author is: " + str(payload.cached_message.author) + "\nContent is: "+ str(payload.cached_message.content) + "\nChannel: " + str(payload.cached_message.channel) + "\nSent at: " + str(payload.cached_message.created_at)
+    
     message_channel = bot.get_channel(int(CHANNEL_DELETED_MSGS))
     await message_channel.send(response)
 

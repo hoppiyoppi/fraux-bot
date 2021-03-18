@@ -16,6 +16,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 CHANNEL_GENERAL = os.getenv('CHANNEL_GENERAL')
+CHANNEL_DELETED_MSGS = os.getenv('CHANNEL_DELETED_MSGS')
 
 #has to be a smarter way of doing this lmao
 greetings = ["hi bot", "Hi bot", "hello fraux", "Hello Fraux", "hello Fraux", "Hello bot", "hello bot", "hi fraux", "Hi Fraux", "hi Fraux"]
@@ -59,6 +60,11 @@ async def on_message(message):
         await message.channel.send(response)
     await bot.process_commands(message)
 
+@bot.event
+async def on_raw_message_delete(payload):
+    response = "Payload is: " + str(payload.cached_message)
+    message_channel = bot.get_channel(int(CHANNEL_DELETED_MSGS))
+    await message_channel.send(response)
 
 target_channel_id = CHANNEL_GENERAL
 

@@ -8,6 +8,7 @@ Created on Mon Feb  1 00:05:09 2021
 import os
 import asyncio
 import discord
+import random
 from datetime import datetime
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
@@ -45,6 +46,7 @@ async def bless(ctx):
     await ctx.send(response)
     await ctx.send(file=discord.File('frauxPat.png'))
 
+
 @bot.event
 async def on_ready():
 
@@ -58,6 +60,23 @@ async def on_message(message):
     if message.content in greetings:
         response = "henlo " + message.author.name
         await message.channel.send(response)
+        
+    #thanks to kite for adding this! we'll get you on github eventually...
+    if (message.content.startswith("fraux") or message.content.startswith("Fraux")) and message.content.endswith("?"):
+        answers = random.randint(1,6)
+        if answers == 1:
+            await message.channel.send("yes")
+        elif answers == 2:
+            await message.channel.send("no")
+        elif answers == 3:  
+            await message.channel.send("maybe") 
+        elif answers == 4:
+            await message.channel.send("probably")
+        elif answers == 5:
+            await message.channel.send("probably not")
+        elif answers == 6:
+            await message.channel.send("i'm not sure...")
+    
     await bot.process_commands(message)
 
 @bot.event

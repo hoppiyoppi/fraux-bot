@@ -10,6 +10,7 @@ import asyncio
 import discord
 import random
 from datetime import datetime
+from datetime import timezone
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
 
@@ -109,7 +110,7 @@ async def before():
     global startTime
     global targetTime
     global timeDiff
-    now = datetime.now()
+    now = datetime.now(tz=timezone.utc)
     startTime = datetime.strptime(now.strftime("%H:%M:%S"), '%H:%M:%S')
     targetTime = datetime.strptime('20:00:00', '%H:%M:%S')
     timeDiff = (targetTime - startTime).seconds  

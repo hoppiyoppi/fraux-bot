@@ -25,6 +25,7 @@ CHANNEL_DELETED_MSGS = os.getenv('CHANNEL_DELETED_MSGS')
 #has to be a smarter way of doing this lmao
 greetings = ["hi bot", "Hi bot", "hello fraux", "Hello Fraux", "hello Fraux", "Hello bot", "hello bot", "hi fraux", "Hi Fraux", "hi Fraux"]
 
+musicQueue = []
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"))
 
@@ -80,10 +81,14 @@ class Music(commands.Cog):
     async def play(self, ctx, *, query):
         """Plays a file from the local filesystem"""
 
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
 
-        await ctx.send(f'Now playing: {query}')
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
+        if ctx.voice_client.is_playing():
+            musicQueue.append(source)
+            await ctx.send('Added to queue')
+        else:
+            ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
+            await ctx.send(f'Now playing: {query}')
 
     @commands.command()
     async def yt(self, ctx, *, url):
@@ -91,9 +96,12 @@ class Music(commands.Cog):
 
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop)
-            ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
-
-        await ctx.send(f'Now playing: {player.title}')
+            if ctx.voice_client.is_playing():
+                musicQueue.append(player)
+                await ctx.send('Added to queue')
+            else:
+                ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else ctx.voice_client.play(musicQueue[0], after=lambda e: print(f'Player error: {e}') if e else None))
+                await ctx.send(f'Now playing: {player.title}')
         
 
     @commands.command()
@@ -140,8 +148,11 @@ class Music(commands.Cog):
             else:
                 await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
-        elif ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
+        #elif ctx.voice_client.is_playing(): #we handle this in the definition of the play commands
+            #source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
+            #musicQueue.append(source)
+            #await ctx.send('Added to queue')
+            #ctx.voice_client.stop()
 
 @bot.command(name='join', help='Tells the bot to join the voice channel')
 async def join(ctx):

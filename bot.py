@@ -77,6 +77,14 @@ class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    def musicQueuePlay(self, ctx, queue):
+        if queue:
+            ctx.voice_client.play(queue[0], after=lambda e: print(f'Player error: {e}') if e else Music.musicQueuePlay(self, ctx, queue))
+            #await ctx.send(f'Now playing: {queue[0].title}')
+            time.sleep(10)            
+            queue.pop(0)
+        #else:
+            #await ctx.send('Queue is now empty')
     @commands.command()
     async def play(self, ctx, *, query):
         """Plays a file from the local filesystem"""
@@ -100,7 +108,7 @@ class Music(commands.Cog):
                 musicQueue.append(player)
                 await ctx.send('Added to queue')
             else:
-                ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else ctx.voice_client.play(musicQueue[0], after=lambda e: print(f'Player error: {e}') if e else None))
+                ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else Music.musicQueuePlay(self, ctx, musicQueue))
                 await ctx.send(f'Now playing: {player.title}')
         
 

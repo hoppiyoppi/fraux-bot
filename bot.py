@@ -23,6 +23,7 @@ CHANNEL_GENERAL = os.getenv('CHANNEL_GENERAL')
 CHANNEL_DELETED_MSGS = os.getenv('CHANNEL_DELETED_MSGS')
 
 #has to be a smarter way of doing this lmao
+#TODO: make this use wildcarding etc
 greetings = ["hi bot", "Hi bot", "hello fraux", "Hello Fraux", "hello Fraux", "Hello bot", "hello bot", "hi fraux", "Hi Fraux", "hi Fraux"]
 
 musicQueue = []
@@ -31,7 +32,7 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"))
 
 
 youtube_dl.utils.bug_reports_message = lambda: ''
-
+#TODO: Test different playback settings. 
 ytdl_format_options = {
     'format': 'bestaudio',
     'restrictfilenames': True,
@@ -77,6 +78,7 @@ class Music(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    #TODO: Add some form of user feedback for an empty queue and when the next song in the queue has started.
     def musicQueuePlay(self, ctx, queue):
         if queue:
             ctx.voice_client.play(queue[0], after=lambda e: print(f'Player error: {e}') if e else Music.musicQueuePlay(self, ctx, queue))
@@ -85,18 +87,8 @@ class Music(commands.Cog):
             queue.pop(0)
         #else:
             #await ctx.send('Queue is now empty')
-    @commands.command()
-    async def play(self, ctx, *, query):
-        """Plays a file from the local filesystem"""
 
 
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        if ctx.voice_client.is_playing():
-            musicQueue.append(source)
-            await ctx.send('Added to queue')
-        else:
-            ctx.voice_client.play(source, after=lambda e: print(f'Player error: {e}') if e else None)
-            await ctx.send(f'Now playing: {query}')
 
     @commands.command()
     async def yt(self, ctx, *, url):
@@ -104,40 +96,21 @@ class Music(commands.Cog):
 
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            #test to see if a small delay helps stop with audio speeding up            
+            time.sleep(3)
             if ctx.voice_client.is_playing():
                 musicQueue.append(player)
                 await ctx.send('Added to queue')
             else:
                 ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else Music.musicQueuePlay(self, ctx, musicQueue))
                 await ctx.send(f'Now playing: {player.title}')
-        
-
-    @commands.command()
-    async def stream(self, ctx, *, url):
-        """Streams from a url (same as yt, but doesn't predownload)"""
-
-        async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=lambda e: print(f'Player error: {e}') if e else None)
-
-        await ctx.send(f'Now playing: {player.title}')
-        
-
-    @commands.command()
-    async def volume(self, ctx, volume: int):
-        """Changes the player's volume"""
-
-        if ctx.voice_client is None:
-            return await ctx.send("Not connected to a voice channel.")
-
-        ctx.voice_client.source.volume = volume / 100
-        await ctx.send(f"Changed volume to {volume}%")
 
     @commands.command()
     async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
         await ctx.voice_client.disconnect()
         time.sleep(5)
+        musicQueue = []
         files_in_directory = os.listdir()
         filtered_files = [file for file in files_in_directory if file.endswith(".webm") or file.endswith(".m4a")]
         for file in filtered_files:
@@ -162,16 +135,8 @@ class Music(commands.Cog):
             #await ctx.send('Added to queue')
             #ctx.voice_client.stop()
 
-@bot.command(name='join', help='Tells the bot to join the voice channel')
-async def join(ctx):
-    if not ctx.message.author.voice:
-        await ctx.send("{} is not connected to a voice channel".format(ctx.message.author.name))
-        return
-    else:
-        channel = ctx.message.author.voice.channel
-    await channel.connect()
 
-
+#TODO: make this occur upon user joining,
 @bot.command()
 async def welcome(ctx):
 
@@ -182,7 +147,7 @@ async def welcome(ctx):
 @bot.command()
 async def helpme(ctx):
 
-    response = "I am Fraux Bot! Here are my current commands:\n!welcome to send a welcome message\n!bless to send luck for your gacha rolls!\nMy repo is at https://github.com/hoppiyoppi/fraux-bot\nFor questions, contact @hoppiyoppi#1863"
+    response = "I am Fraux Bot!\nMy repo is at https://github.com/hoppiyoppi/fraux-bot\nFor questions, contact @hoppiyoppi#1863"
     await ctx.send(response)
     
 @bot.command()
